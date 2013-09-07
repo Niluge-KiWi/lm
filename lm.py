@@ -168,6 +168,9 @@ def parse_arguments():
     parser.add_argument('-a','--alphabetical',
             action="store_true",default=False,
             help="sort by alphabetical order of title instead of rating")
+    parser.add_argument('-t','--time',
+            action="store_true",default=False,
+            help="sort by file time order instead of rating")
     parser.add_argument('-r','--reverse',
             action="store_true", default=False,
             help="show media in reverse order")
@@ -356,6 +359,7 @@ class store(dict):
 class ListMovies():
 
     order_alpha     = False
+    order_time      = False
     order_reverse   = False
     filter_phrase   = None
 
@@ -367,6 +371,7 @@ class ListMovies():
 
         if options:
             self.order_alpha = options.alphabetical
+            self.order_time = options.time
             self.order_reverse = options.reverse
             self.filter_phrase = options.filter
             self.filter_dict = options.filter_dict if options.filter else None
@@ -427,6 +432,7 @@ class ListMovies():
 
         self.default_hash = {
             'bytesize'            : None,
+            'time'                : None,
             'imdb_check'          : 0,
             'm_id'                : None,
             'm_title'             : None,
@@ -597,6 +603,7 @@ class ListMovies():
 
                     cache_hash[cur_hash] = store( self.default_hash )
                     cache_hash[cur_hash]['bytesize'] = os.path.getsize(path)
+                    cache_hash[cur_hash]['time'] = os.path.getmtime(path)
 
         self.save_cache()
 
@@ -1332,6 +1339,8 @@ class ListMovies():
 
         if self.order_alpha:
             keyword = 'm_canonical_title'
+        elif self.order_time:
+            keyword = 'time'
         else:
             keyword = 'm_rating'
 
